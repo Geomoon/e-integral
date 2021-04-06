@@ -1,6 +1,5 @@
 from tkinter import *
 from sympy import *
-from sympy.abc import x
 
 #Para el dibujado de ecuaciones
 import matplotlib
@@ -13,6 +12,7 @@ class Calculadora:
         matplotlib.use('TkAgg')
         init_printing(use_latex=True)
         self.font = ('Segoe UI', '12')
+        self.x = symbols('x')
 
         self.root = Tk()
         self.root.resizable(0, 0)
@@ -30,16 +30,18 @@ class Calculadora:
         Label(self.frame, bg='#457B9D', width=2, height=8).place(x=0, y=45)
         Label(self.frame, bg='#457B9D', width=2, height=8).place(x=600, y=45)
 
+        Label(self.panel, text='Integrar en función de x', font=('Segoe UI', '10')).place(x=50, y=15)
         Label(self.panel, text='∫', font=('Segoe UI', '52')).place(x=30, y=49)
         Label(self.panel, text='(', font=('Segoe UI', '48')).place(x=100, y=49)
         Label(self.panel, text=')', font=('Segoe UI', '48')).place(x=500, y=49)
+        Label(self.panel, text='dx', font=('Segoe UI', '30')).place(x=530, y=70)
 
         #Salida ecuaciones
             #RESULTADO
         self.lb_canvas = Label(self.frame)
-        self.lb_canvas.place(width=620, height=270, x=0, y=230)
+        self.lb_canvas.place(width=620, height=260, x=0, y=230)
 
-        self.fig = matplotlib.figure.Figure(dpi=75)
+        self.fig = matplotlib.figure.Figure(dpi=60)
         self.ax = self.fig.add_subplot(111)
 
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.lb_canvas)
@@ -48,6 +50,10 @@ class Calculadora:
 
         self.ax.get_xaxis().set_visible(False)
         self.ax.get_yaxis().set_visible(False)
+        self.ax.spines['right'].set_color('none')
+        self.ax.spines['top'].set_color('none')
+        self.ax.spines['left'].set_color('none')
+        self.ax.spines['bottom'].set_color('none')
 
         #CAMPOS DE ENTRADA
         self.sup = Entry(self.panel)
@@ -67,23 +73,18 @@ class Calculadora:
             font = ('Arial Black', '11')
             ).place(x=270, y=180)
 
-        self.root.bind('<KeyRelease>', self.p)
+        self.root.bind('<KeyRelease>', self.p)  #Evento
 
         self.root.mainloop()
     
     def calcular_normal(self):
         f = self.reformat_in(self.text.get())
-        r = integrate(f, x)
-        self.graph(latex(r))
-
-    def calcular_num(self):
-        f = self.reformat_in(self.text.get())
-        r = integrate(f)
+        r = integrate(f, self.x)
         self.graph(latex(r))
     
     def calcular_definida(self):
         f = self.reformat_in(self.text.get())
-        r = integrate(f, (x, self.sup.get(), self.sub.get()))
+        r = integrate(f, (self.x, self.sup.get(), self.sub.get()))
         self.graph(latex(r))
 
     def reformat_in(self, text):
@@ -97,24 +98,20 @@ class Calculadora:
         if tipo == 0:
             tmptext = "$"+text+"$"
         else:
-            temptext = text
+            tmptext = "" + text
 
         self.ax.clear()
-        self.ax.text(0.1, 0.4, tmptext, fontsize = 30)  
+        self.ax.text(-0.1, 0.45, tmptext, fontsize = 30)  
         self.canvas.draw()
     
     def tipo_integral(self):
         try:
             if self.sub.get() != '' and self.sup.get() != '':
                 self.calcular_definida()
-                return
-            if str(self.text.get()).isnumeric():
-                self.calcular_normal()
-                return
             else:
                 self.calcular_normal()
         except:
-            self.graph('Nose puede integrar', 1)
+            self.graph(text='No se puede integrar', tipo=1)
 
 if __name__ == '__main__':
     v = Calculadora()
