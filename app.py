@@ -17,7 +17,7 @@ class Calculadora:
         self.root = Tk()
         self.root.resizable(0, 0)
         self.root.title(' Calculadora de Integrales ')
-        self.root.iconbitmap('icon.ico')
+        # self.root.iconbitmap('/icon.ico')
 
         self.frame = Frame(self.root)
         self.frame.config(width = 620, height = 500, bg = '#457B9D')
